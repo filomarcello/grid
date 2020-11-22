@@ -1,3 +1,6 @@
+use std::io;
+
+#[derive(Debug, Clone, Copy)]
 struct Actor {
     x: i32,
     y: i32,
@@ -11,20 +14,15 @@ impl Actor {
 struct Arena {
     width: i32,
     height: i32,
-    actor: Actor,
 }
 impl Arena {
-    fn new(width: i32, height: i32, actor: Actor) -> Arena {
-        Arena {
-            width,
-            height,
-            actor,
-        }
+    fn new(width: i32, height: i32) -> Arena {
+        Arena { width, height }
     }
-    fn show(&self) {
-        for x in 0..self.width {
-            for y in 0..self.height {
-                if self.actor.x == x && self.actor.y == y {
+    fn show(&self, actor: Actor) {
+        for y in 0..self.width {
+            for x in 0..self.height {
+                if actor.x == x && actor.y == y {
                     print!("#");
                 } else {
                     print!(".");
@@ -35,8 +33,45 @@ impl Arena {
     }
 }
 
+enum Direction {
+    Up,
+    Right,
+    Down,
+    Left,
+    Hold,
+}
+
+fn read_char() -> char { // TODO: return note when no input is sent
+    let mut input = String::new();
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Non riesco a leggere l'input.");
+    input.trim().chars().nth(0).unwrap()
+}
+
 fn main() {
-    let act = Actor::new(5, 5);
-    let arena = Arena::new(10, 10, act);
-    arena.show();
+    let mut act = Actor::new(5, 5);
+    let mut arena = Arena::new(10, 10);
+    let mut direction = Direction::Hold;
+    loop {
+        print!("\x1B[2J\x1B[1;1H"); // clears screen
+        arena.show(act);
+        // println!("{:#?}", act);
+        println!("Direzione?");
+        let choice = read_char();
+        direction = match choice {
+            'w' => Direction::Up,
+            's' => Direction::Down,
+            'd' => Direction::Right,
+            'a' => Direction::Left,
+            _ => Direction::Hold,
+        };
+        match direction {
+            Direction::Up => act.y -= 1,
+            Direction::Right => act.x += 1,
+            Direction::Down => act.y += 1,
+            Direction::Left => act.x -= 1,
+            Direction::Hold => {}
+        }
+    }
 }
