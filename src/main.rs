@@ -1,4 +1,7 @@
 use std::io;
+use rand::Rng;
+use std::thread;
+use std::time::Duration;
 
 #[derive(Clone)]
 struct Actor {
@@ -19,7 +22,18 @@ impl Actor {
             Direction::Right => self.x += 1,
             Direction::Down => self.y += 1,
             Direction::Left => self.x -= 1,
-            Direction::Hold => {}
+            Direction::Hold => {},
+        }
+    }
+    fn think() -> Direction {
+        let dir = rand::thread_rng().gen_range(0, 5);
+        match dir {
+            0 => Direction::Hold,
+            1 => Direction::Down,
+            2 => Direction::Left,
+            3 => Direction::Right,
+            4 => Direction::Up,
+            _ => Direction::Hold,
         }
     }
 }
@@ -32,7 +46,7 @@ impl Arena {
     fn new(width: i32, height: i32) -> Arena {
         Arena { width, height }
     }
-    fn show(&self, actor: Actor) {
+    fn show(&self, actor: &Actor) {
         for y in 0..self.width {
             for x in 0..self.height {
                 if actor.x == x && actor.y == y {
@@ -68,17 +82,10 @@ fn main() {
     let arena = Arena::new(10, 10);
     loop {
         print!("\x1B[2J\x1B[1;1H"); // clears screen
-        arena.show(act);
-        // println!("{:#?}", act);
-        println!("Direzione?");
-        let choice = read_char();
-        act.redir(match choice {
-            'w' => Direction::Up,
-            's' => Direction::Down,
-            'd' => Direction::Right,
-            'a' => Direction::Left,
-            _ => Direction::Hold,
-        });
+        arena.show(&act);
+        act.redir(Actor::think());
         act.step();
+        thread::sleep(Duration::from_millis(500));
+
     }
 }
