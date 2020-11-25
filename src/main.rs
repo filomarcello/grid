@@ -1,4 +1,3 @@
-use std::io;
 use rand::Rng;
 use std::thread;
 use std::time::Duration;
@@ -67,14 +66,6 @@ enum Direction {
     Down,
     Left,
     Hold,
-}
-
-fn read_char() -> char { // TODO: return note when no input is sent
-    let mut input = String::new();
-    io::stdin()
-        .read_line(&mut input)
-        .expect("Non riesco a leggere l'input.");
-    input.trim().chars().nth(0).unwrap()
 }
 
 fn main() {
