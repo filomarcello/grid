@@ -1,13 +1,26 @@
 use std::io;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone)]
 struct Actor {
     x: i32,
     y: i32,
+    dir: Direction,
 }
 impl Actor {
     fn new(x: i32, y: i32) -> Actor {
-        Actor { x, y }
+        Actor { x, y, dir: Direction::Hold }
+    }
+    fn redir(&mut self, direction: Direction) {
+        self.dir = direction;
+    }
+    fn step(&mut self) {
+        match self.dir {
+            Direction::Up => self.y -= 1,
+            Direction::Right => self.x += 1,
+            Direction::Down => self.y += 1,
+            Direction::Left => self.x -= 1,
+            Direction::Hold => {}
+        }
     }
 }
 
@@ -33,6 +46,7 @@ impl Arena {
     }
 }
 
+#[derive(Clone)]
 enum Direction {
     Up,
     Right,
@@ -51,27 +65,20 @@ fn read_char() -> char { // TODO: return note when no input is sent
 
 fn main() {
     let mut act = Actor::new(5, 5);
-    let mut arena = Arena::new(10, 10);
-    let mut direction = Direction::Hold;
+    let arena = Arena::new(10, 10);
     loop {
         print!("\x1B[2J\x1B[1;1H"); // clears screen
         arena.show(act);
         // println!("{:#?}", act);
         println!("Direzione?");
         let choice = read_char();
-        direction = match choice {
+        act.redir(match choice {
             'w' => Direction::Up,
             's' => Direction::Down,
             'd' => Direction::Right,
             'a' => Direction::Left,
             _ => Direction::Hold,
-        };
-        match direction {
-            Direction::Up => act.y -= 1,
-            Direction::Right => act.x += 1,
-            Direction::Down => act.y += 1,
-            Direction::Left => act.x -= 1,
-            Direction::Hold => {}
-        }
+        });
+        act.step();
     }
 }
