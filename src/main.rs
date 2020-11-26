@@ -1,6 +1,4 @@
 use rand::Rng;
-use std::thread;
-use std::time::Duration;
 
 #[derive(Clone)]
 struct Actor {
@@ -62,9 +60,11 @@ impl Layer10x10 {
     }
     fn new_border() -> Layer10x10 {
         let mut layer = Layer10x10::new_empty();
-        for x in 0..10 {
-            layer.put(Tile::new_block(), 0, x);
-            layer.put(Tile::new_block(), 9, x);
+        for i in 0..10 {
+            layer.put(Tile::new_block(), 0, i);
+            layer.put(Tile::new_block(), 9, i);
+            layer.put(Tile::new_block(), i, 0);
+            layer.put(Tile::new_block(), i, 9);
         }
         layer
 
@@ -72,24 +72,22 @@ impl Layer10x10 {
     fn put(&mut self, tile: Tile, x: u32, y: u32) {
         self.tiles[y as usize][x as usize] = tile;
     }
+    fn get(&self, x: u32, y: u32) -> Tile {
+        self.tiles[y as usize][x as usize]
+    }
 }
 
-struct Arena {
-    width: i32,
-    height: i32,
+struct Arena10x10 {
+    layers: Vec<Layer10x10>
 }
-impl Arena {
-    fn new(width: i32, height: i32) -> Arena {
-        Arena { width, height }
+impl Arena10x10 {
+    fn new() -> Arena10x10 {
+        Arena10x10{layers: Vec::new() }
     }
-    fn show(&self, actor: &Actor) {
-        for y in 0..self.width {
-            for x in 0..self.height {
-                if actor.x == x && actor.y == y {
-                    print!("#");
-                } else {
-                    print!(".");
-                }
+    fn show(self) {
+        for y in 0..10 {
+            for x in 0..10 {
+                print!("{}", self.layers[0].get(x, y).img_char );
             }
             println!();
         }
@@ -106,14 +104,20 @@ enum Direction {
 }
 
 fn main() {
-    let mut act = Actor::new(5, 5);
-    let arena = Arena::new(10, 10);
-    loop {
-        print!("\x1B[2J\x1B[1;1H"); // clears screen
-        arena.show(&act);
-        act.redir(Actor::think());
-        act.step();
-        thread::sleep(Duration::from_millis(500));
+    let empty = Layer10x10::new_empty();
+    let squared = Layer10x10::new_border();
+    let mut arena = Arena10x10::new();
+    arena.layers.push(squared);
+    arena.show();
 
-    }
+    // let mut act = Actor::new(5, 5);
+    // let arena = Arena::new(10, 10);
+    // loop {
+    //     print!("\x1B[2J\x1B[1;1H"); // clears screen
+    //     arena.show(&act);
+    //     act.redir(Actor::think());
+    //     act.step();
+    //     thread::sleep(Duration::from_millis(500));
+
+    // }
 }
