@@ -36,6 +36,43 @@ impl Actor {
         }
     }
 }
+#[derive(Clone, Copy)]
+struct Tile {
+    img_char: char,
+    walkable: bool,
+}
+impl Tile {
+    fn new(img_char: char, walkable: bool) -> Tile {
+        Tile{img_char, walkable}
+    }
+    fn new_empty() -> Tile {
+        Tile::new(' ', true)
+    }
+    fn new_block() -> Tile {
+        Tile::new('█', false)
+    }
+}
+
+struct Layer10x10 {
+    tiles: [ [Tile; 10] ; 10 ]
+}
+impl Layer10x10 {
+    fn new_empty() -> Layer10x10 {
+        Layer10x10{tiles: [ [Tile::new_empty(); 10] ; 10 ]}
+    }
+    fn new_border() -> Layer10x10 {
+        let mut layer = Layer10x10::new_empty();
+        for x in 0..10 {
+            layer.put(Tile::new_block(), 0, x);
+            layer.put(Tile::new_block(), 9, x);
+        }
+        layer
+
+    }
+    fn put(&mut self, tile: Tile, x: u32, y: u32) {
+        self.tiles[y as usize][x as usize] = tile;
+    }
+}
 
 struct Arena {
     width: i32,
