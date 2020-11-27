@@ -133,6 +133,9 @@ impl Arena10x10 {
         }
     }
     fn is_walkable(&self, x: u32, y: u32) -> bool {
+        if self.player_pos() == (x, y) {
+            return false
+        }
         let mut walkable = true;
         for layer in &self.layers {
             if layer.is_not_walkable(x, y) {
@@ -174,6 +177,10 @@ fn main() {
     println!(
         "Il tile in (8, 8) è camminabile? {}",
         arena.is_walkable(8, 8)
+    );
+    println!(
+        "Il tile in (3, 3) è camminabile? {}",
+        arena.is_walkable(3, 3)
     );
 
     // let mut act = Actor::new(5, 5);
