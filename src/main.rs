@@ -2,15 +2,17 @@ use rand::Rng;
 
 #[derive(Clone)]
 struct Actor {
-    x: i32,
-    y: i32,
+    x: u32,
+    y: u32,
+    img_char: char,
     dir: Direction,
 }
 impl Actor {
-    fn new(x: i32, y: i32) -> Actor {
+    fn new(x: u32, y: u32, img_char: char) -> Actor {
         Actor {
             x,
             y,
+            img_char,
             dir: Direction::Hold,
         }
     }
@@ -89,11 +91,24 @@ impl Layer10x10 {
 }
 
 struct Arena10x10 {
+    player: Actor,
     layers: Vec<Layer10x10>,
 }
 impl Arena10x10 {
-    fn new() -> Arena10x10 {
-        Arena10x10 { layers: Vec::new() }
+    fn new(player: Actor) -> Arena10x10 {
+        Arena10x10 {
+            player,
+            layers: Vec::new(),
+        }
+    }
+    fn player_pos(&self) -> (u32, u32) {
+        (self.player.x, self.player.y)
+    }
+    fn player_pos_x(&self) -> u32 {
+        self.player_pos().0
+    }
+    fn player_pos_y(&self) -> u32 {
+        self.player_pos().1
     }
     fn add_layer(&mut self, layer: Layer10x10) {
         self.layers.push(layer);
@@ -101,14 +116,18 @@ impl Arena10x10 {
     fn show(&self) {
         for y in 0..10 {
             for x in 0..10 {
-                let mut img_char = ' ';
-                for layer in &self.layers {
-                    img_char = layer.get(x, y).img_char;
-                    if img_char != ' ' {
-                        break;
+                if self.player_pos() == (x, y) {
+                    print!("{}", self.player.img_char);
+                } else {
+                    let mut img_char = ' ';
+                    for layer in &self.layers {
+                        img_char = layer.get(x, y).img_char;
+                        if img_char != ' ' {
+                            break;
+                        }
                     }
+                    print!("{}", img_char);
                 }
-                print!("{}", img_char);
             }
             println!();
         }
@@ -137,18 +156,25 @@ enum Direction {
 }
 
 fn main() {
+    let mut player = Actor::new(3, 3, '*');
     let mut pillars = Layer10x10::new_empty();
     pillars.put(Tile::new_block(), 4, 4);
     pillars.put(Tile::new_block(), 4, 5);
     pillars.put(Tile::new_block(), 5, 4);
     pillars.put(Tile::new_block(), 5, 5);
     let squared = Layer10x10::new_border();
-    let mut arena = Arena10x10::new();
+    let mut arena = Arena10x10::new(player);
     arena.add_layer(squared);
     arena.add_layer(pillars);
     arena.show();
-    println!("Il tile in (4, 4) è camminabile? {}", arena.is_walkable(4, 4));
-    println!("Il tile in (8, 8) è camminabile? {}", arena.is_walkable(8, 8));
+    println!(
+        "Il tile in (4, 4) è camminabile? {}",
+        arena.is_walkable(4, 4)
+    );
+    println!(
+        "Il tile in (8, 8) è camminabile? {}",
+        arena.is_walkable(8, 8)
+    );
 
     // let mut act = Actor::new(5, 5);
     // let arena = Arena::new(10, 10);
