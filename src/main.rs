@@ -80,6 +80,12 @@ impl Layer10x10 {
     fn get(&self, x: u32, y: u32) -> Tile {
         self.tiles[y as usize][x as usize]
     }
+    fn is_walkable(&self, x: u32, y: u32) -> bool {
+        self.get(x, y).walkable
+    }
+    fn is_not_walkable(&self, x: u32, y: u32) -> bool {
+        !self.is_walkable(x, y)
+    }
 }
 
 struct Arena10x10 {
@@ -92,7 +98,7 @@ impl Arena10x10 {
     fn add_layer(&mut self, layer: Layer10x10) {
         self.layers.push(layer);
     }
-    fn show(self) {
+    fn show(&self) {
         for y in 0..10 {
             for x in 0..10 {
                 let mut img_char = ' ';
@@ -107,6 +113,18 @@ impl Arena10x10 {
             println!();
         }
     }
+    fn is_walkable(&self, x: u32, y: u32) -> bool {
+        let mut walkable = true;
+        for layer in &self.layers {
+            if layer.is_not_walkable(x, y) {
+                walkable = false;
+            }
+        }
+        walkable
+    }
+    fn is_not_walkable(&self, x: u32, y: u32) -> bool {
+        !self.is_walkable(x, y)
+    }
 }
 
 #[derive(Clone)]
@@ -120,15 +138,17 @@ enum Direction {
 
 fn main() {
     let mut pillars = Layer10x10::new_empty();
-    pillars.put(Tile::new_block(),4, 4);
-    pillars.put(Tile::new_block(),4, 5);
-    pillars.put(Tile::new_block(),5, 4);
-    pillars.put(Tile::new_block(),5, 5);
+    pillars.put(Tile::new_block(), 4, 4);
+    pillars.put(Tile::new_block(), 4, 5);
+    pillars.put(Tile::new_block(), 5, 4);
+    pillars.put(Tile::new_block(), 5, 5);
     let squared = Layer10x10::new_border();
     let mut arena = Arena10x10::new();
     arena.add_layer(squared);
     arena.add_layer(pillars);
     arena.show();
+    println!("Il tile in (4, 4) è camminabile? {}", arena.is_walkable(4, 4));
+    println!("Il tile in (8, 8) è camminabile? {}", arena.is_walkable(8, 8));
 
     // let mut act = Actor::new(5, 5);
     // let arena = Arena::new(10, 10);
