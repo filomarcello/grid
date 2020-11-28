@@ -6,6 +6,10 @@ pub struct Tile {
     walkable: bool,
 }
 
+pub struct Detection {
+    // TODO: implement how to detect environment
+}
+
 impl Tile {
     pub fn new(img_char: char, walkable: bool) -> Tile {
         Tile { img_char, walkable }
@@ -72,8 +76,8 @@ impl Arena10x10 {
     fn player_pos_y(&self) -> u32 {
         self.player_pos().1
     }
-    fn player_think(&self) {
-
+    fn player_observe(&mut self) {
+        // TODO: player observe environment
     }
     pub fn add_layer(&mut self, layer: Layer10x10) {
         self.layers.push(layer);
