@@ -1,4 +1,6 @@
 use rand::Rng;
+use std::thread;
+use std::time::Duration;
 
 #[derive(Clone)]
 struct Actor {
@@ -28,7 +30,7 @@ impl Actor {
             Direction::Hold => {}
         }
     }
-    fn think() -> Direction {
+    fn think(&self) -> Direction {
         let dir = rand::thread_rng().gen_range(0, 5);
         match dir {
             0 => Direction::Hold,
@@ -38,6 +40,10 @@ impl Actor {
             4 => Direction::Up,
             _ => Direction::Hold,
         }
+    }
+    fn operate(&mut self) {
+        self.redir(self.think());
+        self.step();
     }
 }
 #[derive(Clone, Copy)]
@@ -134,7 +140,7 @@ impl Arena10x10 {
     }
     fn is_walkable(&self, x: u32, y: u32) -> bool {
         if self.player_pos() == (x, y) {
-            return false
+            return false;
         }
         let mut walkable = true;
         for layer in &self.layers {
@@ -147,6 +153,9 @@ impl Arena10x10 {
     fn is_not_walkable(&self, x: u32, y: u32) -> bool {
         !self.is_walkable(x, y)
     }
+    fn tick(&mut self) {
+        self.player.operate();
+    }
 }
 
 #[derive(Clone)]
@@ -156,6 +165,11 @@ enum Direction {
     Down,
     Left,
     Hold,
+}
+
+// utilities
+fn clrscr() {
+    print!("\x1B[2J\x1B[1;1H"); // clears screen
 }
 
 fn main() {
@@ -169,28 +183,11 @@ fn main() {
     let mut arena = Arena10x10::new(player);
     arena.add_layer(squared);
     arena.add_layer(pillars);
-    arena.show();
-    println!(
-        "Il tile in (4, 4) è camminabile? {}",
-        arena.is_walkable(4, 4)
-    );
-    println!(
-        "Il tile in (8, 8) è camminabile? {}",
-        arena.is_walkable(8, 8)
-    );
-    println!(
-        "Il tile in (3, 3) è camminabile? {}",
-        arena.is_walkable(3, 3)
-    );
 
-    // let mut act = Actor::new(5, 5);
-    // let arena = Arena::new(10, 10);
-    // loop {
-    //     print!("\x1B[2J\x1B[1;1H"); // clears screen
-    //     arena.show(&act);
-    //     act.redir(Actor::think());
-    //     act.step();
-    //     thread::sleep(Duration::from_millis(500));
-
-    // }
+    loop {
+        clrscr();
+        arena.show();
+        arena.tick();
+        thread::sleep(Duration::from_millis(500));
+    }
 }
