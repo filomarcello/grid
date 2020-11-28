@@ -2,11 +2,11 @@ mod actor;
 mod arena;
 mod tools;
 
+use actor::Actor;
+use arena::{Arena10x10, Layer10x10, Tile};
 use rand::Rng;
 use std::thread;
 use std::time::Duration;
-use actor::Actor;
-use arena::{Layer10x10, Tile, Arena10x10};
 use tools::clrscr;
 
 fn main() {

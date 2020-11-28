@@ -56,7 +56,6 @@ pub struct Arena10x10 {
     player: Actor,
     layers: Vec<Layer10x10>,
 }
-
 impl Arena10x10 {
     pub fn new(player: Actor) -> Arena10x10 {
         Arena10x10 {
@@ -72,6 +71,9 @@ impl Arena10x10 {
     }
     fn player_pos_y(&self) -> u32 {
         self.player_pos().1
+    }
+    fn player_think(&self) {
+
     }
     pub fn add_layer(&mut self, layer: Layer10x10) {
         self.layers.push(layer);
