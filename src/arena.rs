@@ -85,40 +85,15 @@ impl Arena10x10 {
         self.player_pos().1
     }
     pub fn player_observe(&self) -> Detection {
-        // TODO: rewrite code in rustacean
         let mut detect = Detection::new();
-        detect.walk_around.insert(
-            Direction::N,
-            self.is_walkable(self.player_pos_x(), self.player_pos_y() - 1),
-        );
-        detect.walk_around.insert(
-            Direction::NE,
-            self.is_walkable(self.player_pos_x() + 1, self.player_pos_y() - 1),
-        );
-        detect.walk_around.insert(
-            Direction::E,
-            self.is_walkable(self.player_pos_x() + 1, self.player_pos_y()),
-        );
-        detect.walk_around.insert(
-            Direction::SE,
-            self.is_walkable(self.player_pos_x() + 1, self.player_pos_y() + 1),
-        );
-        detect.walk_around.insert(
-            Direction::S,
-            self.is_walkable(self.player_pos_x(), self.player_pos_y() + 1),
-        );
-        detect.walk_around.insert(
-            Direction::SW,
-            self.is_walkable(self.player_pos_x() - 1, self.player_pos_y() + 1),
-        );
-        detect.walk_around.insert(
-            Direction::W,
-            self.is_walkable(self.player_pos_x() - 1, self.player_pos_y()),
-        );
-        detect.walk_around.insert(
-            Direction::NW,
-            self.is_walkable(self.player_pos_x() - 1, self.player_pos_y() - 1),
-        );
+        for (dir, diff) in Direction::differential() {
+            if self.is_walkable(
+                (self.player_pos_x() as i32 + diff.0) as u32,
+                (self.player_pos_y() as i32 + diff.1) as u32,
+            ) {
+                detect.walk_around.insert(dir, true);
+            }
+        }
         detect
     }
     pub fn add_layer(&mut self, layer: Layer10x10) {

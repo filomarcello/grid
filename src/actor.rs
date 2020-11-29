@@ -1,5 +1,6 @@
 use crate::arena::Detection;
 use rand::seq::SliceRandom;
+use std::collections::HashMap;
 
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
 pub enum Direction {
@@ -11,6 +12,20 @@ pub enum Direction {
     SW,
     W,
     NW,
+}
+impl Direction {
+    pub fn differential() -> HashMap<Direction, (i32, i32)> {
+        let mut differential = HashMap::new();
+        differential.insert(Direction::N, (0, -1));
+        differential.insert(Direction::NE, (1, -1));
+        differential.insert(Direction::E, (1, 0));
+        differential.insert(Direction::SE, (1, 1));
+        differential.insert(Direction::S, (0, 1));
+        differential.insert(Direction::SW, (-1, 1));
+        differential.insert(Direction::W, (-1, 0));
+        differential.insert(Direction::NW, (-1, -1));
+        differential
+    }
 }
 #[derive(PartialEq, Debug)]
 pub enum Action {
