@@ -1,13 +1,15 @@
-use rand::Rng;
-
-#[derive(Clone)]
-enum Direction {
-    Up,
-    Right,
-    Down,
-    Left,
+#[derive(Clone, Eq, PartialEq, Hash, Debug)]
+pub enum Direction {
+    N,
+    NE,
+    E,
+    SE,
+    S,
+    SW,
+    W,
+    NW,
 }
-
+#[derive(PartialEq)]
 enum Action {
     Hold,
     Move,
@@ -27,7 +29,7 @@ impl Actor {
             x,
             y,
             img_char,
-            dir: Direction::Left,
+            dir: Direction::W,
         }
     }
     pub fn redir(&mut self, direction: Direction) {
@@ -35,10 +37,26 @@ impl Actor {
     }
     fn step(&mut self) {
         match self.dir {
-            Direction::Up => self.y -= 1,
-            Direction::Right => self.x += 1,
-            Direction::Down => self.y += 1,
-            Direction::Left => self.x -= 1,
+            Direction::N => self.y -= 1,
+            Direction::E => self.x += 1,
+            Direction::S => self.y += 1,
+            Direction::W => self.x -= 1,
+            Direction::NE => {
+                self.x += 1;
+                self.y -= 1
+            }
+            Direction::SE => {
+                self.x += 1;
+                self.y += 1
+            }
+            Direction::SW => {
+                self.x -= 1;
+                self.y += 1
+            }
+            Direction::NW => {
+                self.x -= 1;
+                self.y -= 1
+            }
         }
     }
     pub fn think(&self) -> Action {

@@ -1,13 +1,30 @@
-use crate::actor::Actor;
+use crate::actor::{Actor, Direction};
+use std::collections::HashMap;
+
+#[derive(Debug)]
+pub struct Detection {
+    // TODO: implement how to detect environment
+    walk_around: HashMap<Direction, bool>,
+}
+impl Detection {
+    pub fn new() -> Detection {
+        let mut around = HashMap::new();
+        around.insert(Direction::N, false);
+        around.insert(Direction::E, false);
+        around.insert(Direction::S, false);
+        around.insert(Direction::W, false);
+        around.insert(Direction::NE, false);
+        around.insert(Direction::SE, false);
+        around.insert(Direction::SW, false);
+        around.insert(Direction::NW, false);
+        Detection { walk_around: around }
+    }
+}
 
 #[derive(Clone, Copy)]
 pub struct Tile {
     pub img_char: char,
     walkable: bool,
-}
-
-pub struct Detection {
-    // TODO: implement how to detect environment
 }
 
 impl Tile {
@@ -76,8 +93,42 @@ impl Arena10x10 {
     fn player_pos_y(&self) -> u32 {
         self.player_pos().1
     }
-    fn player_observe(&mut self) {
-        // TODO: player observe environment
+    pub fn player_observe(&self) -> Detection {
+        // TODO: rewrite code in rustacean
+        let mut detect = Detection::new();
+        detect.walk_around.insert(
+            Direction::N,
+            self.is_walkable(self.player.x, self.player.y - 1),
+        );
+        detect.walk_around.insert(
+            Direction::NE,
+            self.is_walkable(self.player.x + 1, self.player.y - 1),
+        );
+        detect.walk_around.insert(
+            Direction::E,
+            self.is_walkable(self.player.x + 1, self.player.y),
+        );
+        detect.walk_around.insert(
+            Direction::SE,
+            self.is_walkable(self.player.x + 1, self.player.y + 1),
+        );
+        detect.walk_around.insert(
+            Direction::S,
+            self.is_walkable(self.player.x, self.player.y + 1),
+        );
+        detect.walk_around.insert(
+            Direction::SW,
+            self.is_walkable(self.player.x - 1, self.player.y + 1),
+        );
+        detect.walk_around.insert(
+            Direction::W,
+            self.is_walkable(self.player.x - 1, self.player.y),
+        );
+        detect.walk_around.insert(
+            Direction::NW,
+            self.is_walkable(self.player.x - 1, self.player.y - 1),
+        );
+        detect
     }
     pub fn add_layer(&mut self, layer: Layer10x10) {
         self.layers.push(layer);
