@@ -100,35 +100,35 @@ impl Arena10x10 {
         let mut detect = Detection::new();
         detect.walk_around.insert(
             Direction::N,
-            self.is_walkable(self.player.x, self.player.y - 1),
+            self.is_walkable(self.player_pos_x(), self.player_pos_y() - 1),
         );
         detect.walk_around.insert(
             Direction::NE,
-            self.is_walkable(self.player.x + 1, self.player.y - 1),
+            self.is_walkable(self.player_pos_x() + 1, self.player_pos_y() - 1),
         );
         detect.walk_around.insert(
             Direction::E,
-            self.is_walkable(self.player.x + 1, self.player.y),
+            self.is_walkable(self.player_pos_x() + 1, self.player_pos_y()),
         );
         detect.walk_around.insert(
             Direction::SE,
-            self.is_walkable(self.player.x + 1, self.player.y + 1),
+            self.is_walkable(self.player_pos_x() + 1, self.player_pos_y() + 1),
         );
         detect.walk_around.insert(
             Direction::S,
-            self.is_walkable(self.player.x, self.player.y + 1),
+            self.is_walkable(self.player_pos_x(), self.player_pos_y() + 1),
         );
         detect.walk_around.insert(
             Direction::SW,
-            self.is_walkable(self.player.x - 1, self.player.y + 1),
+            self.is_walkable(self.player_pos_x() - 1, self.player_pos_y() + 1),
         );
         detect.walk_around.insert(
             Direction::W,
-            self.is_walkable(self.player.x - 1, self.player.y),
+            self.is_walkable(self.player_pos_x() - 1, self.player_pos_y()),
         );
         detect.walk_around.insert(
             Direction::NW,
-            self.is_walkable(self.player.x - 1, self.player.y - 1),
+            self.is_walkable(self.player_pos_x() - 1, self.player_pos_y() - 1),
         );
         detect
     }
@@ -165,9 +165,6 @@ impl Arena10x10 {
             }
         }
         walkable
-    }
-    fn is_not_walkable(&self, x: u32, y: u32) -> bool {
-        !self.is_walkable(x, y)
     }
     pub fn tick(&mut self) {
         self.player.operate();

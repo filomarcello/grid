@@ -20,8 +20,8 @@ pub enum Action {
 
 #[derive(Clone)]
 pub struct Actor {
-    pub x: u32,
-    pub y: u32,
+    pub(crate) x: u32,
+    pub(crate) y: u32,
     pub img_char: char,
     dir: Direction,
 }
@@ -34,7 +34,7 @@ impl Actor {
             dir: Direction::W,
         }
     }
-    pub fn redir(&mut self, direction: Direction) {
+    fn redir(&mut self, direction: Direction) {
         self.dir = direction;
     }
     fn step(&mut self) {
@@ -68,7 +68,7 @@ impl Actor {
             .filter(|&(_, &w)| w == true)
             .map(|(&dir, _)| dir.clone())
             .collect();
-        println!("{:#?}", walkable_tiles);
+        //println!("{:#?}", walkable_tiles);
         match walkable_tiles.choose(&mut rand::thread_rng()) {
             None => Action::Hold,
             Some(dir) => {
@@ -76,8 +76,6 @@ impl Actor {
                 Action::Move
             }
         }
-
-        // TODO: get an input and decide what to do
     }
     pub fn operate(&mut self) {
         //if self.think() != Action::Hold {

@@ -4,8 +4,8 @@ mod tools;
 
 use actor::Actor;
 use arena::{Arena10x10, Layer10x10, Tile};
-use std::thread;
-use std::time::Duration;
+// use std::thread;
+// use std::time::Duration;
 use tools::clrscr;
 
 fn main() {
