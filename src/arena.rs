@@ -8,17 +8,8 @@ pub struct Detection {
 }
 impl Detection {
     pub fn new() -> Detection {
-        let mut around = HashMap::new();
-        around.insert(Direction::N, false);
-        around.insert(Direction::E, false);
-        around.insert(Direction::S, false);
-        around.insert(Direction::W, false);
-        around.insert(Direction::NE, false);
-        around.insert(Direction::SE, false);
-        around.insert(Direction::SW, false);
-        around.insert(Direction::NW, false);
         Detection {
-            walk_around: around,
+            walk_around: HashMap::new(),
         }
     }
 }
@@ -28,7 +19,6 @@ pub struct Tile {
     pub img_char: char,
     walkable: bool,
 }
-
 impl Tile {
     pub fn new(img_char: char, walkable: bool) -> Tile {
         Tile { img_char, walkable }
@@ -44,7 +34,6 @@ impl Tile {
 pub struct Layer10x10 {
     tiles: [[Tile; 10]; 10],
 }
-
 impl Layer10x10 {
     pub fn new_empty() -> Layer10x10 {
         Layer10x10 {

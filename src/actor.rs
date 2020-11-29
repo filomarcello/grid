@@ -34,7 +34,7 @@ impl Actor {
             dir: Direction::W,
         }
     }
-    fn redir(&mut self, direction: Direction) {
+    fn redirect(&mut self, direction: Direction) {
         self.dir = direction;
     }
     fn step(&mut self) {
@@ -65,14 +65,14 @@ impl Actor {
         let walkable_tiles: Vec<_> = detect
             .walk_around
             .iter()
-            .filter(|&(_, &w)| w == true)
-            .map(|(&dir, _)| dir.clone())
+            .filter(|&(_, &walkable)| walkable == true)
+            .map(|(&direction, _)| direction.clone())
             .collect();
         //println!("{:#?}", walkable_tiles);
         match walkable_tiles.choose(&mut rand::thread_rng()) {
             None => Action::Hold,
             Some(dir) => {
-                self.redir(dir.clone());
+                self.redirect(dir.clone());
                 Action::Move
             }
         }
