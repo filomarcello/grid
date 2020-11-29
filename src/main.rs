@@ -20,7 +20,7 @@ fn main() {
     arena.add_layer(squared);
     arena.add_layer(pillars);
     arena.show();
-    println!("{:#?}", arena.player_observe());
+    println!("{:#?}", arena.player.think(arena.player_observe()));
 
     // loop {
     //     clrscr();

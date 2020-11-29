@@ -1,4 +1,7 @@
-#[derive(Clone, Eq, PartialEq, Hash, Debug)]
+use crate::arena::Detection;
+use rand::seq::SliceRandom;
+
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
 pub enum Direction {
     N,
     NE,
@@ -9,8 +12,8 @@ pub enum Direction {
     W,
     NW,
 }
-#[derive(PartialEq)]
-enum Action {
+#[derive(PartialEq, Debug)]
+pub enum Action {
     Hold,
     Move,
 }
@@ -22,7 +25,6 @@ pub struct Actor {
     pub img_char: char,
     dir: Direction,
 }
-
 impl Actor {
     pub fn new(x: u32, y: u32, img_char: char) -> Actor {
         Actor {
@@ -59,13 +61,27 @@ impl Actor {
             }
         }
     }
-    pub fn think(&self) -> Action {
-        Action::Hold // TODO: get an input and decide what to do
+    pub fn think(&mut self, detect: Detection) -> Action {
+        let walkable_tiles: Vec<_> = detect
+            .walk_around
+            .iter()
+            .filter(|&(_, &w)| w == true)
+            .map(|(&dir, _)| dir.clone())
+            .collect();
+        println!("{:#?}", walkable_tiles);
+        match walkable_tiles.choose(&mut rand::thread_rng()) {
+            None => Action::Hold,
+            Some(dir) => {
+                self.redir(dir.clone());
+                Action::Move
+            }
+        }
+
+        // TODO: get an input and decide what to do
     }
     pub fn operate(&mut self) {
-        if self.think() != Action::Hold {
-            // TODO: do something
-            self.step(); // TODO: possibly step
-        }
+        //if self.think() != Action::Hold {
+        // TODO: do something
+        self.step(); // TODO: possibly step
     }
 }

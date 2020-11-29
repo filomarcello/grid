@@ -4,7 +4,7 @@ use std::collections::HashMap;
 #[derive(Debug)]
 pub struct Detection {
     // TODO: implement how to detect environment
-    walk_around: HashMap<Direction, bool>,
+    pub walk_around: HashMap<Direction, bool>,
 }
 impl Detection {
     pub fn new() -> Detection {
@@ -17,7 +17,9 @@ impl Detection {
         around.insert(Direction::SE, false);
         around.insert(Direction::SW, false);
         around.insert(Direction::NW, false);
-        Detection { walk_around: around }
+        Detection {
+            walk_around: around,
+        }
     }
 }
 
@@ -74,7 +76,7 @@ impl Layer10x10 {
 }
 
 pub struct Arena10x10 {
-    player: Actor,
+    pub player: Actor,
     layers: Vec<Layer10x10>,
 }
 impl Arena10x10 {
