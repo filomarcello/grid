@@ -28,13 +28,13 @@ impl Actor {
     fn step(&mut self) {
         self.position = self.position + Direction::dir_to_diff(self.dir);
     }
-
     pub fn think(&mut self, detect: Detection) -> Action {
+        // random AI: randomly chooses a free tile around
         let walkable_tiles: Vec<_> = detect
             .walk_around
             .iter()
-            .filter(|&(_, &walkable)| walkable == true)
-            .map(|(&direction, _)| direction.clone())
+            .filter(|&(_, &walkable)| walkable)
+            .map(|(&direction, _)| direction)
             .collect();
         //println!("{:#?}", walkable_tiles);
         match walkable_tiles.choose(&mut rand::thread_rng()) {
@@ -45,9 +45,9 @@ impl Actor {
             }
         }
     }
-    pub fn operate(&mut self) {
-        //if self.think() != Action::Hold {
-        // TODO: do something
-        self.step(); // TODO: possibly step
+    pub fn operate(&mut self, action: Action) {
+        if action == Action::Move {
+            self.step();
+        }
     }
 }

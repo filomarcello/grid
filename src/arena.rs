@@ -77,7 +77,7 @@ impl Arena10x10 {
         }
     }
     fn player_pos(&self) -> Position {
-        self.player.position.clone()
+        self.player.position
     }
     pub fn player_observe(&self) -> Detection {
         let mut detect = Detection::new();
@@ -123,6 +123,7 @@ impl Arena10x10 {
         walkable
     }
     pub fn tick(&mut self) {
-        self.player.operate();
+        self.player_observe();
+        // self.player.operate(self.player.think(self.player_observe()));
     }
 }
