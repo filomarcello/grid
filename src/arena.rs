@@ -123,7 +123,9 @@ impl Arena10x10 {
         walkable
     }
     pub fn tick(&mut self) {
-        self.player_observe();
-        // self.player.operate(self.player.think(self.player_observe()));
+        let detect = self.player_observe();
+        let act = self.player.think(detect);
+        self.player.operate(act);
+
     }
 }

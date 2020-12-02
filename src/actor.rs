@@ -1,6 +1,7 @@
 use crate::arena::Detection;
 use crate::geometry::{Direction, Position};
 use rand::seq::SliceRandom;
+use std::fmt;
 
 #[derive(PartialEq, Debug)]
 pub enum Action {
@@ -49,5 +50,10 @@ impl Actor {
         if action == Action::Move {
             self.step();
         }
+    }
+}
+impl fmt::Display for Actor {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Actor pos ({}, {})", self.position.x, self.position.y)
     }
 }
