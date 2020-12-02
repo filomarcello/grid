@@ -8,7 +8,7 @@ use arena::{Arena10x10, Layer10x10, Tile};
 use geometry::Position;
 // use std::thread;
 // use std::time::Duration;
-use tools::clrscr;
+// use tools::clrscr;
 
 fn main() {
     let mut player = Actor::new(Position::new(1, 1), '*');

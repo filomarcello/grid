@@ -10,10 +10,6 @@ impl Position {
     pub fn new(x: u32, y: u32) -> Position {
         Position { x, y }
     }
-    // fn d_P(&mut self, differential: (i32, i32)) {
-    //     self.x += differential.0;
-    //     self.y += differential.1;
-    // }
 }
 impl Add<(i32, i32)> for Position {
     type Output = Position;
@@ -60,17 +56,5 @@ impl Direction {
             Direction::W => (-1, 0),
             Direction::NW => (-1, -1),
         }
-    }
-    pub fn differential() -> HashMap<Direction, (i32, i32)> {
-        let mut differential = HashMap::new();
-        differential.insert(Direction::N, (0, -1));
-        differential.insert(Direction::NE, (1, -1));
-        differential.insert(Direction::E, (1, 0));
-        differential.insert(Direction::SE, (1, 1));
-        differential.insert(Direction::S, (0, 1));
-        differential.insert(Direction::SW, (-1, 1));
-        differential.insert(Direction::W, (-1, 0));
-        differential.insert(Direction::NW, (-1, -1));
-        differential
     }
 }

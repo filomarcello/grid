@@ -79,12 +79,6 @@ impl Arena10x10 {
     fn player_pos(&self) -> Position {
         self.player.position.clone()
     }
-    fn player_pos_x(&self) -> u32 {
-        self.player_pos().x
-    }
-    fn player_pos_y(&self) -> u32 {
-        self.player_pos().y
-    }
     pub fn player_observe(&self) -> Detection {
         let mut detect = Detection::new();
         for dir in &DIRECTIONS {

@@ -1,7 +1,6 @@
 use crate::arena::Detection;
 use crate::geometry::{Direction, Position};
 use rand::seq::SliceRandom;
-use std::collections::HashMap;
 
 #[derive(PartialEq, Debug)]
 pub enum Action {
