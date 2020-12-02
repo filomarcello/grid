@@ -1,4 +1,5 @@
-use crate::actor::{Actor, Direction};
+use crate::actor::Actor;
+use crate::geometry::{Direction, Position, DIRECTIONS};
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -43,24 +44,24 @@ impl Layer10x10 {
     pub fn new_border() -> Layer10x10 {
         let mut layer = Layer10x10::new_empty();
         for i in 0..10 {
-            layer.put(Tile::new_block(), 0, i);
-            layer.put(Tile::new_block(), 9, i);
-            layer.put(Tile::new_block(), i, 0);
-            layer.put(Tile::new_block(), i, 9);
+            layer.put(Tile::new_block(), Position::new(0, i));
+            layer.put(Tile::new_block(), Position::new(9, i));
+            layer.put(Tile::new_block(), Position::new(i, 0));
+            layer.put(Tile::new_block(), Position::new(i, 9));
         }
         layer
     }
-    pub fn put(&mut self, tile: Tile, x: u32, y: u32) {
-        self.tiles[y as usize][x as usize] = tile;
+    pub fn put(&mut self, tile: Tile, position: Position) {
+        self.tiles[position.y as usize][position.x as usize] = tile;
     }
-    fn get(&self, x: u32, y: u32) -> Tile {
-        self.tiles[y as usize][x as usize]
+    fn get(&self, position: Position) -> Tile {
+        self.tiles[position.y as usize][position.x as usize]
     }
-    fn is_walkable(&self, x: u32, y: u32) -> bool {
-        self.get(x, y).walkable
+    fn is_walkable(&self, position: Position) -> bool {
+        self.get(position).walkable
     }
-    fn is_not_walkable(&self, x: u32, y: u32) -> bool {
-        !self.is_walkable(x, y)
+    fn is_not_walkable(&self, position: Position) -> bool {
+        !self.is_walkable(position)
     }
 }
 
@@ -75,23 +76,20 @@ impl Arena10x10 {
             layers: Vec::new(),
         }
     }
-    fn player_pos(&self) -> (u32, u32) {
-        (self.player.x, self.player.y)
+    fn player_pos(&self) -> Position {
+        self.player.position.clone()
     }
     fn player_pos_x(&self) -> u32 {
-        self.player_pos().0
+        self.player_pos().x
     }
     fn player_pos_y(&self) -> u32 {
-        self.player_pos().1
+        self.player_pos().y
     }
     pub fn player_observe(&self) -> Detection {
         let mut detect = Detection::new();
-        for (dir, diff) in Direction::differential() {
-            if self.is_walkable(
-                (self.player_pos_x() as i32 + diff.0) as u32,
-                (self.player_pos_y() as i32 + diff.1) as u32,
-            ) {
-                detect.walk_around.insert(dir, true);
+        for dir in &DIRECTIONS {
+            if self.is_walkable(self.player_pos() + Direction::dir_to_diff(*dir)) {
+                detect.walk_around.insert(*dir, true);
             }
         }
         detect
@@ -102,12 +100,12 @@ impl Arena10x10 {
     pub fn show(&self) {
         for y in 0..10 {
             for x in 0..10 {
-                if self.player_pos() == (x, y) {
+                if self.player_pos() == Position::new(x, y) {
                     print!("{}", self.player.img_char);
                 } else {
                     let mut img_char = ' ';
                     for layer in &self.layers {
-                        img_char = layer.get(x, y).img_char;
+                        img_char = layer.get(Position::new(x, y)).img_char;
                         if img_char != ' ' {
                             break;
                         }
@@ -118,13 +116,13 @@ impl Arena10x10 {
             println!();
         }
     }
-    fn is_walkable(&self, x: u32, y: u32) -> bool {
-        if self.player_pos() == (x, y) {
+    fn is_walkable(&self, position: Position) -> bool {
+        if self.player_pos() == position {
             return false;
         }
-        let mut walkable = true;
+        let mut walkable = true; // TODO: rewrite in rustacean
         for layer in &self.layers {
-            if layer.is_not_walkable(x, y) {
+            if layer.is_not_walkable(position) {
                 walkable = false;
             }
         }

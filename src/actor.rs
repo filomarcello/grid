@@ -1,32 +1,8 @@
 use crate::arena::Detection;
+use crate::geometry::{Direction, Position};
 use rand::seq::SliceRandom;
 use std::collections::HashMap;
 
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
-pub enum Direction {
-    N,
-    NE,
-    E,
-    SE,
-    S,
-    SW,
-    W,
-    NW,
-}
-impl Direction {
-    pub fn differential() -> HashMap<Direction, (i32, i32)> {
-        let mut differential = HashMap::new();
-        differential.insert(Direction::N, (0, -1));
-        differential.insert(Direction::NE, (1, -1));
-        differential.insert(Direction::E, (1, 0));
-        differential.insert(Direction::SE, (1, 1));
-        differential.insert(Direction::S, (0, 1));
-        differential.insert(Direction::SW, (-1, 1));
-        differential.insert(Direction::W, (-1, 0));
-        differential.insert(Direction::NW, (-1, -1));
-        differential
-    }
-}
 #[derive(PartialEq, Debug)]
 pub enum Action {
     Hold,
@@ -35,16 +11,14 @@ pub enum Action {
 
 #[derive(Clone)]
 pub struct Actor {
-    pub(crate) x: u32,
-    pub(crate) y: u32,
+    pub position: Position,
     pub img_char: char,
     dir: Direction,
 }
 impl Actor {
-    pub fn new(x: u32, y: u32, img_char: char) -> Actor {
+    pub fn new(position: Position, img_char: char) -> Actor {
         Actor {
-            x,
-            y,
+            position,
             img_char,
             dir: Direction::W,
         }
@@ -53,29 +27,9 @@ impl Actor {
         self.dir = direction;
     }
     fn step(&mut self) {
-        match self.dir {
-            Direction::N => self.y -= 1,
-            Direction::E => self.x += 1,
-            Direction::S => self.y += 1,
-            Direction::W => self.x -= 1,
-            Direction::NE => {
-                self.x += 1;
-                self.y -= 1
-            }
-            Direction::SE => {
-                self.x += 1;
-                self.y += 1
-            }
-            Direction::SW => {
-                self.x -= 1;
-                self.y += 1
-            }
-            Direction::NW => {
-                self.x -= 1;
-                self.y -= 1
-            }
-        }
+        self.position = self.position + Direction::dir_to_diff(self.dir);
     }
+
     pub fn think(&mut self, detect: Detection) -> Action {
         let walkable_tiles: Vec<_> = detect
             .walk_around
