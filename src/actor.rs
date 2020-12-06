@@ -1,8 +1,9 @@
+use crate::ai;
+use crate::ai::Ai;
 use crate::arena::Detection;
 use crate::geometry::{Direction, Position};
 use rand::seq::SliceRandom;
 use std::fmt;
-use crate::ai::Ai;
 
 #[derive(PartialEq, Debug)]
 pub enum Action {
@@ -14,15 +15,20 @@ pub enum Action {
 pub struct Actor {
     pub position: Position,
     pub img_char: char,
+    ai: Ai,
     dir: Direction,
 }
 impl Actor {
-    pub fn new(position: Position, img_char: char) -> Actor {
+    pub fn new(position: Position, img_char: char, ai: Ai) -> Actor {
         Actor {
             position,
             img_char,
+            ai,
             dir: Direction::W,
         }
+    }
+    pub fn new_player(position: Position, img_char: char) -> Actor {
+        Actor::new(position, img_char, ai::human_player)
     }
     fn redirect(&mut self, direction: Direction) {
         self.dir = direction;
@@ -30,8 +36,8 @@ impl Actor {
     fn step(&mut self) {
         self.position = self.position + Direction::dir_to_diff(self.dir);
     }
-    pub fn think(&mut self, detect: Detection, ai: Ai) -> Action {
-        let dir = ai(detect);
+    fn think(&mut self, detect: Detection) -> Action {
+        let dir = (self.ai)(detect);
         match dir {
             None => Action::Hold,
             Some(direction) => {
@@ -40,11 +46,14 @@ impl Actor {
             }
         }
     }
-
-    pub fn operate(&mut self, action: Action) {
+    fn operate(&mut self, action: Action) {
         if action == Action::Move {
             self.step();
-        }
+        } // TODO: implement other actions
+    }
+    pub fn tick(&mut self, detect: Detection) {
+        let action = self.think(detect);
+        self.operate(action);
     }
 }
 impl fmt::Display for Actor {

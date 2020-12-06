@@ -1,7 +1,7 @@
 use crate::actor::Actor;
+use crate::ai;
 use crate::geometry::{Direction, Position, DIRECTIONS};
 use std::collections::HashMap;
-use crate::ai;
 
 #[derive(Debug)]
 pub struct Detection {
@@ -65,56 +65,81 @@ impl Layer10x10 {
 
 pub struct Arena10x10 {
     pub player: Actor,
+    pub npcs: Vec<Actor>,
     layers: Vec<Layer10x10>,
 }
 impl Arena10x10 {
     pub fn new(player: Actor) -> Arena10x10 {
         Arena10x10 {
             player,
+            npcs: Vec::new(),
             layers: Vec::new(),
         }
     }
-    fn player_pos(&self) -> Position {
-        self.player.position
+    pub fn add_layer(&mut self, layer: Layer10x10) {
+        self.layers.push(layer);
     }
-    pub fn player_observe(&self) -> Detection {
+    pub fn add_npc(&mut self, actor: Actor) {
+        self.npcs.push(actor);
+    }
+    fn actor_pos(actor: &Actor) -> Position {
+        actor.position
+    }
+    fn player_pos(&self) -> Position {
+        Self::actor_pos(&self.player)
+    }
+    fn actor_observe(&self, actor: &Actor) -> Detection {
         let mut detect = Detection::new();
         for dir in &DIRECTIONS {
-            if self.is_walkable(self.player_pos() + Direction::dir_to_diff(*dir)) {
+            if self.is_walkable(Self::actor_pos(actor) + Direction::dir_to_diff(*dir)) {
                 detect.walk_around.insert(*dir, true);
             }
         }
         detect
     }
-    pub fn add_layer(&mut self, layer: Layer10x10) {
-        self.layers.push(layer);
+    fn are_npcs_in(&self, position: Position) -> Option<&Actor> {
+        for npc in &self.npcs {
+            if Self::actor_pos(&npc) == position {
+                return Some(&npc);
+            }
+        }
+        None
+    }
+    fn is_walkable(&self, position: Position) -> bool {
+        !(self.player_pos() == position)
+            && self.npcs.iter().all(|npc| Self::actor_pos(npc) == position)
+            && self.layers.iter().all(|layer| layer.is_walkable(position))
+    }
+    pub fn tick(&mut self) {
+        self.player.tick(self.actor_observe(&self.player));
+        for mut actor in &self.npcs {
+            let detect = self.actor_observe(actor);
+            // actor.tick(detect);
+        }
     }
     pub fn show(&self) {
         for y in 0..10 {
             for x in 0..10 {
-                if self.player_pos() == Position::new(x, y) {
+                let place = Position::new(x, y);
+                if self.player_pos() == place {
                     print!("{}", self.player.img_char);
-                } else {
-                    let mut img_char = ' ';
-                    for layer in &self.layers {
-                        img_char = layer.get(Position::new(x, y)).img_char;
-                        if img_char != ' ' {
-                            break;
+                    continue;
+                }
+                match self.are_npcs_in(place) {
+                    Some(actor) => print!("{}", actor.img_char),
+                    None => {
+                        let mut img_char = ' ';
+                        for layer in &self.layers {
+                            img_char = layer.get(Position::new(x, y)).img_char;
+                            if img_char != ' ' {
+                                break;
+                            }
                         }
+                        print!("{}", img_char);
                     }
-                    print!("{}", img_char);
                 }
             }
             println!();
         }
-    }
-    fn is_walkable(&self, position: Position) -> bool {
-        !(self.player_pos() == position)
-            && self.layers.iter().all(|layer| layer.is_walkable(position))
-    }
-    pub fn tick(&mut self) {
-        let detect = self.player_observe();
-        let act = self.player.think(detect, ai::random_walk);
-        self.player.operate(act);
     }
 }
