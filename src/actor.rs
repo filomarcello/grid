@@ -1,3 +1,4 @@
+use crate::ai;
 use crate::arena::Detection;
 use crate::geometry::{Direction, Position};
 use rand::seq::SliceRandom;
@@ -30,28 +31,23 @@ impl Actor {
         self.position = self.position + Direction::dir_to_diff(self.dir);
     }
     pub fn think(&mut self, detect: Detection) -> Action {
-        // random AI: randomly chooses a free tile around
-        let walkable_tiles: Vec<_> = detect
-            .walk_around
-            .iter()
-            .filter(|&(_, &walkable)| walkable)
-            .map(|(&direction, _)| direction)
-            .collect();
-        //println!("{:#?}", walkable_tiles);
-        match walkable_tiles.choose(&mut rand::thread_rng()) {
+        let dir = ai::random_walk(detect);
+        match dir {
             None => Action::Hold,
-            Some(dir) => {
-                self.redirect(*dir);
+            Some(direction) => {
+                self.redirect(direction);
                 Action::Move
             }
         }
     }
+
     pub fn operate(&mut self, action: Action) {
         if action == Action::Move {
             self.step();
         }
     }
 }
+
 impl fmt::Display for Actor {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Actor pos ({}, {})", self.position.x, self.position.y)
