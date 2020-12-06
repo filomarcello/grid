@@ -1,6 +1,7 @@
 use crate::actor::Actor;
 use crate::geometry::{Direction, Position, DIRECTIONS};
 use std::collections::HashMap;
+use crate::ai;
 
 #[derive(Debug)]
 pub struct Detection {
@@ -113,7 +114,7 @@ impl Arena10x10 {
     }
     pub fn tick(&mut self) {
         let detect = self.player_observe();
-        let act = self.player.think(detect);
+        let act = self.player.think(detect, ai::random_walk);
         self.player.operate(act);
     }
 }

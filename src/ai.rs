@@ -4,6 +4,8 @@ use crate::geometry::Direction;
 use rand::seq::SliceRandom;
 use std::collections::HashMap;
 
+pub type Ai = fn(Detection) -> Option<Direction>;
+
 fn walkable_tiles(walk_around: HashMap<Direction, bool>) -> Vec<Direction> {
     walk_around
         .iter()
@@ -11,6 +13,10 @@ fn walkable_tiles(walk_around: HashMap<Direction, bool>) -> Vec<Direction> {
         .map(|(&direction, _)| direction)
         .collect()
 }
+// TODO: implement with human player action events
+// pub fn human_player(detect: Detection) -> Option<Direction> {
+//     //
+// }
 
 pub fn random_walk(detect: Detection) -> Option<Direction> {
     let walkable_tiles = walkable_tiles(detect.walk_around);

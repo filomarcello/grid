@@ -1,8 +1,8 @@
-use crate::ai;
 use crate::arena::Detection;
 use crate::geometry::{Direction, Position};
 use rand::seq::SliceRandom;
 use std::fmt;
+use crate::ai::Ai;
 
 #[derive(PartialEq, Debug)]
 pub enum Action {
@@ -30,8 +30,8 @@ impl Actor {
     fn step(&mut self) {
         self.position = self.position + Direction::dir_to_diff(self.dir);
     }
-    pub fn think(&mut self, detect: Detection) -> Action {
-        let dir = ai::random_walk(detect);
+    pub fn think(&mut self, detect: Detection, ai: Ai) -> Action {
+        let dir = ai(detect);
         match dir {
             None => Action::Hold,
             Some(direction) => {
@@ -47,7 +47,6 @@ impl Actor {
         }
     }
 }
-
 impl fmt::Display for Actor {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Actor pos ({}, {})", self.position.x, self.position.y)

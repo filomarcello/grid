@@ -17,7 +17,6 @@ fn main() {
     let mut arena = Arena10x10::new(player);
     arena.add_layer(squared);
     arena.show();
-    println!("{:#?}", arena.player.think(arena.player_observe()));
 
     loop {
         clrscr();
