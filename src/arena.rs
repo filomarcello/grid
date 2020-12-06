@@ -126,6 +126,5 @@ impl Arena10x10 {
         let detect = self.player_observe();
         let act = self.player.think(detect);
         self.player.operate(act);
-
     }
 }
