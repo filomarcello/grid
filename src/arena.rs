@@ -60,9 +60,6 @@ impl Layer10x10 {
     fn is_walkable(&self, position: Position) -> bool {
         self.get(position).walkable
     }
-    fn is_not_walkable(&self, position: Position) -> bool {
-        !self.is_walkable(position)
-    }
 }
 
 pub struct Arena10x10 {
@@ -111,16 +108,8 @@ impl Arena10x10 {
         }
     }
     fn is_walkable(&self, position: Position) -> bool {
-        if self.player_pos() == position {
-            return false;
-        }
-        let mut walkable = true; // TODO: rewrite in rustacean
-        for layer in &self.layers {
-            if layer.is_not_walkable(position) {
-                walkable = false;
-            }
-        }
-        walkable
+        !(self.player_pos() == position)
+            && self.layers.iter().all(|layer| layer.is_walkable(position))
     }
     pub fn tick(&mut self) {
         let detect = self.player_observe();

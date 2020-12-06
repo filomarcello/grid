@@ -41,7 +41,7 @@ impl Actor {
         match walkable_tiles.choose(&mut rand::thread_rng()) {
             None => Action::Hold,
             Some(dir) => {
-                self.redirect(dir.clone());
+                self.redirect(*dir);
                 Action::Move
             }
         }

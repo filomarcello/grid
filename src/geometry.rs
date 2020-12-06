@@ -22,7 +22,6 @@ impl Add<(i32, i32)> for Position {
 
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
 pub enum Direction {
-    // TODO: valued enum for differential
     N,
     NE,
     E,
