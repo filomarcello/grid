@@ -2,7 +2,6 @@ use crate::ai;
 use crate::ai::Ai;
 use crate::arena::Detection;
 use crate::geometry::{Direction, Position};
-use rand::seq::SliceRandom;
 use std::fmt;
 
 #[derive(PartialEq, Debug)]

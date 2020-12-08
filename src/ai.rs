@@ -1,4 +1,3 @@
-use crate::actor::Action;
 use crate::arena::Detection;
 use crate::geometry::Direction;
 use rand::seq::SliceRandom;
@@ -14,7 +13,7 @@ fn walkable_tiles(walk_around: HashMap<Direction, bool>) -> Vec<Direction> {
         .collect()
 }
 
-pub fn human_player(detect: Detection) -> Option<Direction> {
+pub fn human_player(_detect: Detection) -> Option<Direction> {
     None // TODO: implement with human player action events
 }
 
