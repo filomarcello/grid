@@ -1,6 +1,6 @@
 use crate::ai;
 use crate::ai::Ai;
-use crate::arena::Detection;
+use crate::arena::{observe_from, Arena10x10, Detection};
 use crate::geometry::{Direction, Position};
 use std::fmt;
 
@@ -29,11 +29,20 @@ impl Actor {
     pub fn new_player(position: Position, img_char: char) -> Actor {
         Actor::new(position, img_char, ai::human_player)
     }
+    pub fn is_in(&self, position: Position) -> bool {
+        self.position == position
+    }
+    pub fn is_not_in(&self, position: Position) -> bool {
+        !(self.is_in(position))
+    }
     fn redirect(&mut self, direction: Direction) {
         self.dir = direction;
     }
     fn step(&mut self) {
         self.position = self.position + Direction::dir_to_diff(self.dir);
+    }
+    fn observe(&self, arena: &Arena10x10, npcs: &Vec<Actor>) -> Detection {
+        observe_from(self.position, arena, self, npcs)
     }
     fn think(&mut self, detect: Detection) -> Action {
         let dir = (self.ai)(detect);
@@ -50,7 +59,8 @@ impl Actor {
             self.step();
         } // TODO: implement other actions
     }
-    pub fn tick(&mut self, detect: Detection) {
+    pub fn tick(&mut self, arena: &Arena10x10, npcs: &mut Vec<Actor>) {
+        let detect = self.observe(arena, npcs);
         let action = self.think(detect);
         self.operate(action);
     }
@@ -59,4 +69,11 @@ impl fmt::Display for Actor {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Actor pos ({}, {})", self.position.x, self.position.y)
     }
+}
+
+pub fn are_in(position: Position, actors: &Vec<Actor>) -> bool {
+    actors.iter().any(|actor| actor.is_in(position))
+}
+pub fn are_not_in(position: Position, actors: &Vec<Actor>) -> bool {
+    !(are_in(position, actors))
 }

@@ -1,4 +1,4 @@
-use crate::actor::Actor;
+use crate::actor::{are_in, are_not_in, Actor};
 use crate::geometry::{Direction, Position, DIRECTIONS};
 use std::collections::HashMap;
 
@@ -63,84 +63,69 @@ impl Layer10x10 {
 }
 
 pub struct Arena10x10 {
-    pub player: Actor,
-    pub npcs: Vec<Actor>,
     layers: Vec<Layer10x10>,
 }
 impl Arena10x10 {
-    pub fn new(player: Actor) -> Arena10x10 {
-        Arena10x10 {
-            player,
-            npcs: Vec::new(),
-            layers: Vec::new(),
-        }
+    pub fn new() -> Arena10x10 {
+        Arena10x10 { layers: Vec::new() }
     }
     pub fn add_layer(&mut self, layer: Layer10x10) {
         self.layers.push(layer);
     }
-    pub fn add_npc(&mut self, actor: Actor) {
-        self.npcs.push(actor);
+    fn is_walkable(&self, position: Position) -> bool {
+        self.layers.iter().all(|layer| layer.is_walkable(position))
     }
-    fn observe_from(&self, position: Position) -> Detection {
-        let mut detect = Detection::new();
-        for dir in &DIRECTIONS {
-            if self.is_walkable(position + Direction::dir_to_diff(*dir)) {
-                detect.walk_around.insert(*dir, true);
+}
+
+pub fn observe_from(
+    position: Position,
+    arena: &Arena10x10,
+    player: &Actor,
+    npcs: &Vec<Actor>,
+) -> Detection {
+    let mut detect = Detection::new();
+    for dir in &DIRECTIONS {
+        let place = position + Direction::dir_to_diff(*dir);
+        if arena.is_walkable(place) && player.is_not_in(place) && are_not_in(place, &npcs) {
+            detect.walk_around.insert(*dir, true);
+        }
+    }
+    detect
+}
+
+pub fn show(arena: &Arena10x10, player: &Actor, npcs: &Vec<Actor>) {
+    for y in 0..10 {
+        for x in 0..10 {
+            let place = Position::new(x, y);
+            if player.is_in(place) {
+                print!("{}", player.img_char);
+                continue;
             }
-        }
-        detect
-    }
-    fn npcs_detections(&mut self) -> Vec<Detection> {
-        let mut detections = Vec::new();
-        for npc in &self.npcs {
-            detections.push(self.observe_from(npc.position));
-        }
-        detections
-    }
-    fn are_npcs_in(&self, position: Position) -> bool {
-        self.npcs.iter().any(|npc| npc.position == position)
-    }
-    fn is_walkable(&self, position: Position) -> bool { //TODO: npcs superimpose!
-        !(self.player.position == position)
-            && !(self.are_npcs_in(position))
-            && self.layers.iter().all(|layer| layer.is_walkable(position))
-    }
-    pub fn tick(&mut self) {
-        let player_detect = self.observe_from(self.player.position);
-        self.player.tick(player_detect);
-        let npc_detections = self.npcs_detections();
-        for (npc, detect) in self.npcs.iter_mut().zip(npc_detections) {
-            npc.tick(detect);
-        }
-        // self.npcs.iter_mut().map(|npc| npc.tick(self.observe_from(npc.position)));
-    }
-    pub fn show(&self) {
-        for y in 0..10 {
-            for x in 0..10 {
-                let place = Position::new(x, y);
-                if self.player.position == place {
-                    print!("{}", self.player.img_char);
-                    continue;
-                }
-                if self.are_npcs_in(place) {
-                    for npc in &self.npcs {
-                        if npc.position == place {
-                            print!("{}", npc.img_char);
-                            break;
-                        }
-                    }
-                    continue;
-                }
-                let mut img_char = ' ';
-                for layer in &self.layers {
-                    img_char = layer.get(Position::new(x, y)).img_char;
-                    if img_char != ' ' {
+            if are_in(place, npcs) {
+                for npc in npcs.iter() {
+                    if npc.is_in(place) {
+                        print!("{}", npc.img_char);
                         break;
                     }
                 }
-                print!("{}", img_char);
+                continue;
             }
-            println!();
+            let mut img_char = ' ';
+            for layer in &arena.layers {
+                img_char = layer.get(Position::new(x, y)).img_char;
+                if img_char != ' ' {
+                    break;
+                }
+            }
+            print!("{}", img_char);
         }
+        println!();
+    }
+}
+
+pub fn tick(arena: &Arena10x10, player: &mut Actor, npcs: &mut Vec<Actor>) {
+    player.tick(arena, npcs);
+    for npc in npcs.iter_mut() {
+        npc.tick(arena, npcs);
     }
 }
